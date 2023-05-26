@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Server extends JFrame {
     private JTextArea messageArea;
     private List<ClientHandler> clients;
@@ -35,18 +36,18 @@ public class Server extends JFrame {
 
     private void startServer() {
         try {
-            try (ServerSocket serverSocket = new ServerSocket(8888)) {
-                messageArea.append("Server started on port 8888\n");
+            ServerSocket serverSocket = new ServerSocket(8888);
+            messageArea.append("Server started on port 8888\n");
 
-                while (true) {
-                    Socket clientSocket = serverSocket.accept();
-                    messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
 
-                    ClientHandler clientHandler = new ClientHandler(clientSocket);
-                    clients.add(clientHandler);
-                    clientHandler.start();
-                }
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clients.add(clientHandler);
+                clientHandler.start();
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
