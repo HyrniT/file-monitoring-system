@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.IOException;
 import java.net.Socket;
 
 public class Client extends JFrame {
@@ -13,11 +13,6 @@ public class Client extends JFrame {
     private Socket clientSocket;
     private ClientMessageReceiver messageReceiver;
     private ClientMessageSender messageSender;
-
-    private String serverIP;
-    private int serverPort;
-
-    private static final String CONFIG_FILE = "config.txt";
 
     public Client() {
         setTitle("Client");
@@ -60,28 +55,6 @@ public class Client extends JFrame {
         });
     }
 
-    private void loadConfig() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(CONFIG_FILE));
-            serverIP = reader.readLine();
-            serverPort = Integer.parseInt(reader.readLine());
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveConfig() {
-        try {
-            PrintWriter writer = new PrintWriter(new FileWriter(CONFIG_FILE));
-            writer.println(serverIP);
-            writer.println(serverPort);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void connectToServer(String serverIP, int serverPort) {
         try {
             clientSocket = new Socket(serverIP, serverPort);
@@ -105,11 +78,6 @@ public class Client extends JFrame {
                     }
                 }
             }).start();
-
-            // Save the server configuration
-            this.serverIP = serverIP;
-            this.serverPort = serverPort;
-            saveConfig();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,26 +92,12 @@ public class Client extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                String serverIP = JOptionPane.showInputDialog("Enter server IP:");
+                int serverPort = Integer.parseInt(JOptionPane.showInputDialog("Enter server port:"));
+
                 Client client = new Client();
                 client.setVisible(true);
-                client.loadConfig();
-
-                if (client.serverIP != null && client.serverPort != 0) {
-                    int choice = JOptionPane.showConfirmDialog(null, "Connect to previous server?", "Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (choice == JOptionPane.YES_OPTION) {
-                        client.connectToServer(client.serverIP, client.serverPort);
-                    } else {
-                        client.serverIP = null;
-                        client.serverPort = 0;
-                        client.saveConfig();
-                    }
-                }
-
-                if (client.serverIP == null || client.serverPort == 0) {
-                    String serverIP = JOptionPane.showInputDialog("Enter server IP:");
-                    int serverPort = Integer.parseInt(JOptionPane.showInputDialog("Enter server port:"));
-                    client.connectToServer(serverIP, serverPort);
-                }
+                client.connectToServer(serverIP, serverPort);
             }
         });
     }

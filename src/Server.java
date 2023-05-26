@@ -3,15 +3,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
 public class Server extends JFrame {
     private JTextArea messageArea;
     private List<ClientHandler> clients;
@@ -40,16 +35,17 @@ public class Server extends JFrame {
 
     private void startServer() {
         try {
-            ServerSocket serverSocket = new ServerSocket(8888);
-            messageArea.append("Server started on port 8888\n");
+            try (ServerSocket serverSocket = new ServerSocket(8888)) {
+                messageArea.append("Server started on port 8888\n");
 
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
 
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clients.add(clientHandler);
-                clientHandler.start();
+                    ClientHandler clientHandler = new ClientHandler(clientSocket);
+                    clients.add(clientHandler);
+                    clientHandler.start();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +70,6 @@ public class Server extends JFrame {
     private class ClientHandler extends Thread {
         private Socket clientSocket;
         private String clientName;
-        private PrintWriter writer;
 
         public ClientHandler(Socket socket) {
             clientSocket = socket;
@@ -82,17 +77,13 @@ public class Server extends JFrame {
 
         public void run() {
             try {
-                InputStream inputStream = clientSocket.getInputStream();
-                Scanner scanner = new Scanner(inputStream);
-                OutputStream outputStream = clientSocket.getOutputStream();
-                writer = new PrintWriter(outputStream, true);
+                ClientMessageReceiver messageReceiver = new ClientMessageReceiver(clientSocket);
+                clientName = messageReceiver.receiveMessage();
 
-                clientName = scanner.nextLine();
                 messageArea.append("Client name: " + clientName + "\n");
 
                 String message;
-                while (scanner.hasNextLine()) {
-                    message = scanner.nextLine();
+                while ((message = messageReceiver.receiveMessage()) != null) {
                     messageArea.append(clientName + ": " + message + "\n");
                     broadcastMessage(clientName + ": " + message);
                 }
@@ -106,7 +97,12 @@ public class Server extends JFrame {
         }
 
         public void sendMessage(String message) {
-            writer.println(message);
+            try {
+                ClientMessageSender messageSender = new ClientMessageSender(clientSocket);
+                messageSender.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
