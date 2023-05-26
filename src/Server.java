@@ -37,16 +37,17 @@ public class Server extends JFrame {
 
     private void startServer() {
         try {
-            ServerSocket serverSocket = new ServerSocket(8888);
-            messageArea.append("Server started on port 8888\n");
+            try (ServerSocket serverSocket = new ServerSocket(8888)) {
+                messageArea.append("Server started on port 8888\n");
 
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
 
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clients.add(clientHandler);
-                clientHandler.start();
+                    ClientHandler clientHandler = new ClientHandler(clientSocket);
+                    clients.add(clientHandler);
+                    clientHandler.start();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
