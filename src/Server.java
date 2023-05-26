@@ -1,4 +1,4 @@
-package Server;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,10 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import Client.ClientMessageSender;
-import Client.ClientMessageReceiver;
-
 public class Server extends JFrame {
     private JTextArea messageArea;
     private List<ClientHandler> clients;
