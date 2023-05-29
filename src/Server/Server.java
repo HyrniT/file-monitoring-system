@@ -33,10 +33,34 @@ public class Server extends JFrame {
         JButton startButton = new JButton("Start Server");
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startServer();
+                // startServer();
+                new Thread(new StartServer()).start();
             }
         });
         getContentPane().add(startButton, BorderLayout.SOUTH);
+    }
+
+    public class StartServer implements Runnable {
+        @Override
+        public void run() {
+            try {
+                ServerSocket serverSocket = new ServerSocket(8888);
+                messageArea.append("Server started on port 8888\n");
+    
+                while (true) {
+                    Socket clientSocket = serverSocket.accept();
+                    messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
+    
+                    ClientHandler clientHandler = new ClientHandler(clientSocket);
+                    clients.add(clientHandler);
+                    clientHandler.start();
+                }
+    
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void startServer() {
