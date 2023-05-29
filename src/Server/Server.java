@@ -1,4 +1,9 @@
+package Server;
 import javax.swing.*;
+
+import Client.ClientMessageReceiver;
+import Client.ClientMessageSender;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
