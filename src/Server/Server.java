@@ -62,6 +62,7 @@ public class Server {
 
         // Constructors
         public ClientMessageHandler(Socket socket) throws IOException {
+            this.client = new Client();
             this.client.setClientSocket(socket);
             this.messageReceiver = new ClientMessageReceiver(socket);
             this.messageSender = new ClientMessageSender(socket);
