@@ -48,10 +48,7 @@ public class Server {
     }
 
     public class ClientMessageHandler extends Thread {
-        private Socket clientSocket;
-        // private String clientId;
-        private String clientName;
-        private boolean clientStatus = true;
+        private Client client;
         private ClientMessageReceiver messageReceiver;
         private ClientMessageSender messageSender;
 
@@ -63,32 +60,19 @@ public class Server {
             return messageSender;
         }
 
-        public String getClientName() {
-            return clientName;
-        }
-
-        // public String getClientId() {
-        //     return clientId;
-        // }
-
-        public boolean isClientStatus() {
-            return clientStatus;
-        }
-
         // Constructors
         public ClientMessageHandler(Socket socket) throws IOException {
-            this.clientSocket = socket;
-            this.messageReceiver = new ClientMessageReceiver(clientSocket);
-            this.messageSender = new ClientMessageSender(clientSocket);
+            this.client.setClientSocket(socket);
+            this.messageReceiver = new ClientMessageReceiver(socket);
+            this.messageSender = new ClientMessageSender(socket);
         }
         
         @Override
         public void run() {
             try {
-                // ClientMessageReceiver messageReceiver = new ClientMessageReceiver(clientSocket);
-                // this.clientId = (clients.size() - 1) + "";
-                this.clientName = messageReceiver.receiveMessage();
-                String clientIP = clientSocket.getInetAddress().getHostAddress();
+                String clientName = messageReceiver.receiveMessage();
+                client.setClientName(clientName);
+                String clientIP = client.getClientSocket().getInetAddress().getHostAddress();
 
                 String clientMessage = Helper.getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
