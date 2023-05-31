@@ -240,7 +240,7 @@ public class ServerGUI extends JFrame {
             serverIP = localhost.getHostAddress();
             serverName = localhost.getHostName();
 
-            Image icon = new ImageIcon("Images/admin.png").getImage().getScaledInstance(50, 50,
+            Image icon = new ImageIcon("Images/admin.jpg").getImage().getScaledInstance(50, 50,
                     Image.SCALE_SMOOTH);
             serverButton = new JButton();
             serverButton.setIcon(new ImageIcon(icon));
@@ -308,7 +308,7 @@ public class ServerGUI extends JFrame {
     }
 
     public static void createClient(String clientName, String clientIP, boolean clientStatus) {
-        Image icon = new ImageIcon("Images/Client.png").getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        Image icon = new ImageIcon("Images/client.jpg").getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             clientButton = new JButton();
             clientButton.setIcon(new ImageIcon(icon));
             clientButton.setBackground(PrimaryColor);
