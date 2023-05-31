@@ -1,119 +1,122 @@
 package Server;
-import javax.swing.*;
 
-import Client.ClientMessageReceiver;
-import Client.ClientMessageSender;
+import java.net.*;
+import java.io.*;
+import java.util.*;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+public class Server {
+    // Fields
+    private ServerSocket serverSocket; 
+    private List<ClientMessageHandler> clients;
 
-public class Server extends JFrame {
-    private JTextArea messageArea;
-    private List<ClientHandler> clients;
-
-    public Server() {
-        setTitle("Server");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-        messageArea = new JTextArea();
-        messageArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(messageArea);
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
-
-        clients = new ArrayList<ClientHandler>();
-
-        JButton startButton = new JButton("Start Server");
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // startServer();
-                new Thread(new StartServer()).start();
-            }
-        });
-        getContentPane().add(startButton, BorderLayout.SOUTH);
+    public List<ClientMessageHandler> getClients() {
+        return clients;
     }
 
-    public class StartServer implements Runnable {
+    public ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    // Constructors
+    public Server(String serverPort) throws IOException {
+        this.serverSocket = new ServerSocket(Integer.parseInt(serverPort));
+        this.clients = new ArrayList<ClientMessageHandler>();
+    }
+
+    // Methods
+    public void start() {
+        while (true) {
+            try {
+                Socket clientSocket = serverSocket.accept();
+
+                ClientMessageHandler clientMessageHandler = new ClientMessageHandler(clientSocket);
+                clients.add(clientMessageHandler);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                clientMessageHandler.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendMessage(String message, int clientId) {
+        clients.get(clientId).sendMessage(message);
+    }
+
+    public class ClientMessageHandler extends Thread {
+        private Socket clientSocket;
+        // private String clientId;
+        private String clientName;
+        private boolean clientStatus = true;
+        private ClientMessageReceiver messageReceiver;
+        private ClientMessageSender messageSender;
+
+        public ClientMessageReceiver getMessageReceiver() {
+            return messageReceiver;
+        }
+
+        public ClientMessageSender getMessageSender() {
+            return messageSender;
+        }
+
+        public String getClientName() {
+            return clientName;
+        }
+
+        // public String getClientId() {
+        //     return clientId;
+        // }
+
+        public boolean isClientStatus() {
+            return clientStatus;
+        }
+
+        // Constructors
+        public ClientMessageHandler(Socket socket) throws IOException {
+            this.clientSocket = socket;
+            this.messageReceiver = new ClientMessageReceiver(clientSocket);
+            this.messageSender = new ClientMessageSender(clientSocket);
+        }
+        
         @Override
         public void run() {
             try {
-                ServerSocket serverSocket = new ServerSocket(8888);
-                messageArea.append("Server started on port 8888\n");
-    
-                while (true) {
-                    Socket clientSocket = serverSocket.accept();
-                    messageArea.append("Client connected: " + clientSocket.getInetAddress().getHostAddress() + "\n");
-    
-                    ClientHandler clientHandler = new ClientHandler(clientSocket);
-                    clients.add(clientHandler);
-                    clientHandler.start();
-                }
-    
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                // ClientMessageReceiver messageReceiver = new ClientMessageReceiver(clientSocket);
+                // this.clientId = (clients.size() - 1) + "";
+                this.clientName = messageReceiver.receiveMessage();
+                String clientIP = clientSocket.getInetAddress().getHostAddress();
 
-    }
+                String clientMessage = Helper.getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
+                ServerGUI.traceTextArea.append(clientMessage);
 
-    private void broadcastMessage(String message) {
-        for (ClientHandler client : clients) {
-            client.sendMessage(message);
-        }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Server server = new Server();
-                server.setVisible(true);
-            }
-        });
-    }
-
-    private class ClientHandler extends Thread {
-        private Socket clientSocket;
-        private String clientName;
-
-        public ClientHandler(Socket socket) {
-            clientSocket = socket;
-        }
-
-        public void run() {
-            try {
-                ClientMessageReceiver messageReceiver = new ClientMessageReceiver(clientSocket);
-                clientName = messageReceiver.receiveMessage();
-
-                messageArea.append("Client name: " + clientName + "\n");
+                ServerGUI.createClient(clientName, clientIP, true); // tạm thời cho luôn true
 
                 String message;
-                while ((message = messageReceiver.receiveMessage()) != null) {
-                    messageArea.append(clientName + ": " + message + "\n");
-                    broadcastMessage(clientName + ": " + message);
+                while((message = messageReceiver.receiveMessage()) != null) {
+                    message = Helper.getTimestamp() + clientName + " (client) said: " + message;
+                    ServerGUI.traceTextArea.append(message);
                 }
 
-                clientSocket.close();
-                messageArea.append(clientName + " disconnected\n");
-                clients.remove(this);
+                // clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
 
+        // Gửi tin nhắn từ server đến client
         public void sendMessage(String message) {
             try {
-                ClientMessageSender messageSender = new ClientMessageSender(clientSocket);
+                // ClientMessageSender messageSender = new ClientMessageSender(clientSocket);
                 messageSender.sendMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        // Gửi thông tin đường dẫn cần theo dõi từ server đến client
     }
 }
