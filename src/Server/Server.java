@@ -7,10 +7,10 @@ import java.util.*;
 public class Server {
     // Fields
     private ServerSocket serverSocket; 
-    private List<ClientMessageHandler> clients;
+    private List<ClientMessageHandler> clientMessageHandlers;
 
-    public List<ClientMessageHandler> getClients() {
-        return clients;
+    public List<ClientMessageHandler> getClientMessageHandlers() {
+        return clientMessageHandlers;
     }
 
     public ServerSocket getServerSocket() {
@@ -20,7 +20,7 @@ public class Server {
     // Constructors
     public Server(String serverPort) throws IOException {
         this.serverSocket = new ServerSocket(Integer.parseInt(serverPort));
-        this.clients = new ArrayList<ClientMessageHandler>();
+        this.clientMessageHandlers = new ArrayList<ClientMessageHandler>();
     }
 
     // Methods
@@ -30,7 +30,7 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();
 
                 ClientMessageHandler clientMessageHandler = new ClientMessageHandler(clientSocket);
-                clients.add(clientMessageHandler);
+                clientMessageHandlers.add(clientMessageHandler);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -44,7 +44,7 @@ public class Server {
     }
 
     public void sendMessage(String message, int clientId) {
-        clients.get(clientId).sendMessage(message);
+        clientMessageHandlers.get(clientId).sendMessage(message);
     }
 
     public class ClientMessageHandler extends Thread {
