@@ -10,19 +10,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 
 public class ServerGUI extends JFrame {
     private Server server;
     private String serverIP, serverName, serverPort;
     // private Thread serverMonitorThread;
-    private static DefaultMutableTreeNode selectedNode, rootNode;
+    private static DefaultMutableTreeNode selectedNode;
     private static JTree fileTree;
     private static JPanel monitorsPanel;
     private static JLabel clientStatusLabel;
