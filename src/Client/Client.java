@@ -4,9 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Client {
     private Socket clientSocket; 
+    private Thread clientMonitorThread;
     private ClientMessageReceiver messageReceiver;
     private ClientMessageSender messageSender;
     private ClientFileSender fileSender;
@@ -35,6 +45,7 @@ public class Client {
         this.fileSender = new ClientFileSender(clientSocket);
         sendMessage(clientSocket.getInetAddress().getHostName());
         sendFile(selectedFile); 
+        startWatchingServer(selectedFile);
     }
 
     // Methods
@@ -48,5 +59,53 @@ public class Client {
 
     public void sendFile(File file) {
         fileSender.sendFile(file);
+    }
+
+    private void startWatchingServer(File selectedFile) {
+        String folderPath = selectedFile.getAbsolutePath();
+        Path path = Paths.get(folderPath);
+        String clientName = clientSocket.getInetAddress().getHostName();
+        String clientIP = clientSocket.getInetAddress().getHostAddress();
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+    
+            clientMonitorThread = new Thread(() -> {
+                try {
+                    WatchKey watchKey;
+                    while ((watchKey = watchService.take()) != null) {
+                        for (WatchEvent<?> event : watchKey.pollEvents()) {
+                            WatchEvent.Kind<?> kind = event.kind();
+                            if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                                String message = getTimestamp() + clientName + " (" + clientIP + ") created: "
+                                        + selectedFile.toPath().resolve((Path) event.context());
+                                sendMessage(message);
+                            } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                                String message = getTimestamp() + clientName + " (" + clientIP + ") deleted: "
+                                        + selectedFile.toPath().resolve((Path) event.context());
+                                        sendMessage(message);
+                            } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                                String message = getTimestamp() + clientName + " (" + clientIP + ") modified: "
+                                        + selectedFile.toPath().resolve((Path) event.context());
+                                sendMessage(message);
+                            }
+                        }
+                        watchKey.reset();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            clientMonitorThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static String getTimestamp() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return now.format(formatter) + " | ";
     }
 }
