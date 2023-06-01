@@ -14,13 +14,10 @@ import java.net.*;
 public class ServerGUI extends JFrame {
     private Server server;
     private String serverIP, serverName, serverPort;
-    // private Thread serverMonitorThread;
     private static DefaultMutableTreeNode selectedNode;
-    private static JTree fileTree;
     private static JPanel monitorsPanel;
     private static JLabel clientStatusLabel;
     private static JButton traceButton;
-    private static JButton clientButton;
     private static JScrollPane rightScrolPane;
     public static JTextArea traceTextArea;
 
@@ -299,7 +296,7 @@ public class ServerGUI extends JFrame {
         String clientName = clientSocket.getInetAddress().getHostName();
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
         Image icon = new ImageIcon("Server/Images/client.png").getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-        clientButton = new JButton();
+        JButton clientButton = new JButton();
         clientButton.setIcon(new ImageIcon(icon));
         clientButton.setBackground(PrimaryColor);
         clientButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -309,7 +306,7 @@ public class ServerGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 rootNode.removeAllChildren();
                 createFileTree(clientFile, rootNode);
-                fileTree = new JTree(rootNode);
+                JTree fileTree = new JTree(rootNode);
                 fileTree.setBackground(PrimaryColor);
                 fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
                 fileTree.addTreeSelectionListener(new TreeSelectionListener() {
