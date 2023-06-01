@@ -22,7 +22,7 @@ public class ServerGUI extends JFrame {
     private Server server;
     private String serverIP, serverName, serverPort;
     // private Thread serverMonitorThread;
-    private static DefaultMutableTreeNode selectedNode;
+    private static DefaultMutableTreeNode selectedNode, rootNode;
     private static JTree fileTree;
     private static JPanel monitorsPanel;
     private static JLabel clientStatusLabel;
@@ -71,7 +71,16 @@ public class ServerGUI extends JFrame {
         traceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         traceButton.setFocusPainted(false);
         traceButton.setEnabled(false);
-        addButtonActionListener(traceButton);
+        // addButtonActionListener(traceButton);
+        traceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // stopWatchingServer();
+                // startWatchingServer(selectedNode);
+                traceButton.setEnabled(false);
+                // isWatchingServer = true;
+            }
+        });
 
         JButton reloadButton = new JButton();
         reloadButton.setText("Reload");
@@ -232,7 +241,7 @@ public class ServerGUI extends JFrame {
             serverButton.setBackground(PrimaryColor);
             serverButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
             serverButton.setBorder(null);
-            addButtonActionListener(serverButton);
+            // addButtonActionListener(serverButton);
 
             JLabel server = new JLabel("(Server)");
             JLabel name = new JLabel("<html><b>Name: " + "</b>" + serverName + "</html>");
@@ -428,22 +437,6 @@ public class ServerGUI extends JFrame {
         }
     }
 
-    private void addButtonActionListener(JButton button) {
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == traceButton) {
-                    if (selectedNode != null) {
-                        // stopWatchingServer();
-                        // startWatchingServer(selectedNode);
-                        traceButton.setEnabled(false);
-                        // isWatchingServer = true;
-                    }
-                }
-            }
-        });
-    }
-
     private String getPathFromNode(DefaultMutableTreeNode node) {
         StringBuilder path = new StringBuilder();
         path.append(node.getUserObject());
@@ -472,51 +465,51 @@ public class ServerGUI extends JFrame {
     }
 
     // private void startWatchingServer(DefaultMutableTreeNode selectedNode) {
-    // String folderPath = getPathFromNode(selectedNode).toString();
-    // Path path = Paths.get(folderPath);
-    // try {
-    // WatchService watchService = FileSystems.getDefault().newWatchService();
-    // path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-    // StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+    //     String folderPath = getPathFromNode(selectedNode).toString();
+    //     Path path = Paths.get(folderPath);
+    //     try {
+    //         WatchService watchService = FileSystems.getDefault().newWatchService();
+    //         path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+    //                 StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
 
-    // serverMonitorThread = new Thread(new Runnable() {
-    // public void run() {
-    // try {
-    // WatchKey watchKey;
-    // while ((watchKey = watchService.take()) != null) {
-    // for (WatchEvent<?> event : watchKey.pollEvents()) {
-    // WatchEvent.Kind<?> kind = event.kind();
-    // if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-    // String message = Helper.getTimestamp() + serverName + " (server) created: "
-    // + getPathFromNode(selectedNode) + event.context();
-    // traceTextArea.append(message + "\n");
-    // } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-    // String message = Helper.getTimestamp() + serverName + " (server) deleted: "
-    // + getPathFromNode(selectedNode) + event.context();
-    // traceTextArea.append(message + "\n");
-    // } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-    // String message = Helper.getTimestamp() + serverName + " (server) modified: "
-    // + getPathFromNode(selectedNode) + event.context();
-    // traceTextArea.append(message + "\n");
-    // }
-    // }
-    // watchKey.reset();
-    // }
-    // } catch (InterruptedException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // });
-    // serverMonitorThread.start();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
+    //         serverMonitorThread = new Thread(new Runnable() {
+    //             public void run() {
+    //                 try {
+    //                     WatchKey watchKey;
+    //                     while ((watchKey = watchService.take()) != null) {
+    //                         for (WatchEvent<?> event : watchKey.pollEvents()) {
+    //                             WatchEvent.Kind<?> kind = event.kind();
+    //                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+    //                                 String message = Helper.getTimestamp() + serverName + " (server) created: "
+    //                                         + getPathFromNode(selectedNode) + event.context();
+    //                                 traceTextArea.append(message + "\n");
+    //                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+    //                                 String message = Helper.getTimestamp() + serverName + " (server) deleted: "
+    //                                         + getPathFromNode(selectedNode) + event.context();
+    //                                 traceTextArea.append(message + "\n");
+    //                             } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+    //                                 String message = Helper.getTimestamp() + serverName + " (server) modified: "
+    //                                         + getPathFromNode(selectedNode) + event.context();
+    //                                 traceTextArea.append(message + "\n");
+    //                             }
+    //                         }
+    //                         watchKey.reset();
+    //                     }
+    //                 } catch (InterruptedException e) {
+    //                     e.printStackTrace();
+    //                 }
+    //             }
+    //         });
+    //         serverMonitorThread.start();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
     // }
 
     // private void stopWatchingServer() {
-    // if (isWatchingServer) {
-    // serverMonitorThread.interrupt();
-    // }
+    //     if (isWatchingServer) {
+    //         serverMonitorThread.interrupt();
+    //     }
     // }
 
     public class StartServer implements Runnable {
