@@ -4,6 +4,8 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 public class Server {
     // Fields
     private ServerSocket serverSocket; 
@@ -48,9 +50,19 @@ public class Server {
     }
 
     public class ClientMessageHandler extends Thread {
-        private Client client;
+        private Socket clientSocket;
+        private File clientFile = null;
         private ClientMessageReceiver messageReceiver;
         private ClientMessageSender messageSender;
+        private ClientFileReceiver fileReceiver;
+        
+        public File getClientFile() {
+            return clientFile;
+        }
+        
+        public ClientFileReceiver getFileReceiver() {
+            return fileReceiver;
+        }
 
         public ClientMessageReceiver getMessageReceiver() {
             return messageReceiver;
@@ -61,24 +73,30 @@ public class Server {
         }
 
         // Constructors
-        public ClientMessageHandler(Socket socket) throws IOException {
-            this.client = new Client();
-            this.client.setClientSocket(socket);
-            this.messageReceiver = new ClientMessageReceiver(socket);
-            this.messageSender = new ClientMessageSender(socket);
+        public ClientMessageHandler(Socket socket) {
+            this.clientSocket = socket;
+            try {
+                this.messageReceiver = new ClientMessageReceiver(socket);
+                this.messageSender = new ClientMessageSender(socket);
+                this.fileReceiver = new ClientFileReceiver(socket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         
         @Override
         public void run() {
             try {
                 String clientName = messageReceiver.receiveMessage();
-                client.setClientName(clientName);
-                String clientIP = client.getClientSocket().getInetAddress().getHostAddress();
+                clientFile = fileReceiver.receiveFile();
+                DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
+
+                ServerGUI.createFileTree(clientFile, rootNode);
 
                 String clientMessage = Helper.getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
 
-                ServerGUI.createClient(clientName, clientIP, true); // tạm thời cho luôn true
+                ServerGUI.createClient(clientSocket, clientFile, true); // tạm thời cho luôn true
 
                 String message;
                 while((message = messageReceiver.receiveMessage()) != null) {
@@ -86,22 +104,18 @@ public class Server {
                     ServerGUI.traceTextArea.append(message);
                 }
 
-                // clientSocket.close();
-            } catch (IOException e) {
-                // e.printStackTrace();
-            }
-        }
-
-        // Gửi tin nhắn từ server đến client
-        public void sendMessage(String message) {
-            try {
-                // ClientMessageSender messageSender = new ClientMessageSender(clientSocket);
-                messageSender.sendMessage(message);
+                clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        // Gửi thông tin đường dẫn cần theo dõi từ server đến client
+        public void sendMessage(String message) {
+            try {
+                messageSender.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

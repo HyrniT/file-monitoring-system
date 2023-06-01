@@ -1,5 +1,6 @@
 package Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -9,7 +10,12 @@ public class Client {
     private Socket clientSocket; 
     private ClientMessageReceiver messageReceiver;
     private ClientMessageSender messageSender;
+    private ClientFileSender fileSender;
     
+    public ClientFileSender getFileSender() {
+        return fileSender;
+    }
+
     public Socket getClientSocket() {
         return clientSocket;
     }
@@ -23,13 +29,15 @@ public class Client {
     }
 
     // Constructors
-    public Client(String serverIP, String serverPort) throws NumberFormatException, UnknownHostException, IOException {
+    public Client(String serverIP, String serverPort, File selectedFile) throws NumberFormatException, UnknownHostException, IOException {
         this.clientSocket = new Socket(serverIP, Integer.parseInt(serverPort));
         this.messageReceiver = new ClientMessageReceiver(clientSocket);
         this.messageSender = new ClientMessageSender(clientSocket);
+        this.fileSender = new ClientFileSender(clientSocket);
         InetAddress clientAddress = clientSocket.getInetAddress();
         String clientHostName = clientAddress.getHostName();
         sendMessage(clientHostName);
+        sendFile(selectedFile); 
     }
 
     // Methods
@@ -39,5 +47,9 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendFile(File file) {
+        fileSender.sendFile(file);
     }
 }

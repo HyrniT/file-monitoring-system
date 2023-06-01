@@ -19,36 +19,21 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
 public class ServerGUI extends JFrame {
-    // Server
     private Server server;
-
     private String serverIP, serverName, serverPort;
-    private boolean isWatchingServer = false;
-    private Thread serverMonitorThread;
-
-    private DefaultMutableTreeNode selectedNode; /* có thể chỉnh sửa sau */
+    // private Thread serverMonitorThread;
+    private static DefaultMutableTreeNode selectedNode;
+    private static JTree fileTree;
+    private static JPanel monitorsPanel;
+    private static JLabel clientStatusLabel;
+    private static JButton traceButton;
+    private static JButton clientButton;
+    private static JScrollPane rightScrolPane;
+    public static JTextArea traceTextArea;
 
     public static Color PrimaryColor = Color.WHITE;
     public static Color OnPrimaryColor = Color.BLACK;
     public static String MyFont = "Dialog";
-
-    private JTree fileTree;
-    private JPanel rightPanel, toprightPanel, bottomrightPanel,
-            leftPanel, topLeftPanel, bottomLeftPanel,
-            topBottomLeftPanel, topTopLeftPanel;
-
-    private static JPanel monitorsPanel;
-
-    private JPanel buttonPanel;
-    private JLabel directoryLabel, copyrightLabel, appLabel,
-            traceLabel, monitorLabel;
-    private static JLabel clientStatusLabel;
-    private JButton traceButton, exportButton, connectButton, reloadButton, serverButton;
-
-    private static JButton clientButton;
-    private JScrollPane rightScrolPane, topLeftScrolPane, bottomLeftScrolPane;
-    private JSplitPane horizonalSplitPane, verticalSplitPane;
-    public static JTextArea traceTextArea;
 
     public ServerGUI() {
         setTitle("Server");
@@ -56,7 +41,7 @@ public class ServerGUI extends JFrame {
 
         createPortInput();
 
-        new Thread(new StartServer()).start(); // listen client
+        new Thread(new StartServer()).start();
 
         rightScrolPane = new JScrollPane();
         rightScrolPane.setBackground(OnPrimaryColor);
@@ -64,20 +49,20 @@ public class ServerGUI extends JFrame {
         rightScrolPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightScrolPane.setBorder(null);
 
-        rightPanel = new JPanel(new BorderLayout());
+        JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setBackground(PrimaryColor);
         rightPanel.setPreferredSize(new Dimension(250, 0));
         rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         rightPanel.add(rightScrolPane, BorderLayout.CENTER);
 
-        directoryLabel = new JLabel();
+        JLabel directoryLabel = new JLabel();
         directoryLabel.setText("File Tree   ");
         directoryLabel.setFont(new Font(MyFont, Font.BOLD, 15));
         directoryLabel.setForeground(OnPrimaryColor);
         directoryLabel.setBackground(PrimaryColor);
         directoryLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         buttonPanel.setBackground(PrimaryColor);
 
@@ -88,7 +73,7 @@ public class ServerGUI extends JFrame {
         traceButton.setEnabled(false);
         addButtonActionListener(traceButton);
 
-        reloadButton = new JButton();
+        JButton reloadButton = new JButton();
         reloadButton.setText("Reload");
         reloadButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         reloadButton.setFocusPainted(false);
@@ -97,17 +82,17 @@ public class ServerGUI extends JFrame {
         buttonPanel.add(reloadButton);
         buttonPanel.add(traceButton);
 
-        toprightPanel = new JPanel(new BorderLayout());
+        JPanel toprightPanel = new JPanel(new BorderLayout());
         toprightPanel.setBackground(PrimaryColor);
         toprightPanel.add(directoryLabel, BorderLayout.CENTER);
         toprightPanel.add(buttonPanel, BorderLayout.EAST);
 
         rightPanel.add(toprightPanel, BorderLayout.NORTH);
 
-        bottomrightPanel = new JPanel(new FlowLayout());
+        JPanel bottomrightPanel = new JPanel(new FlowLayout());
         bottomrightPanel.setBackground(PrimaryColor);
 
-        copyrightLabel = new JLabel();
+        JLabel copyrightLabel = new JLabel();
         copyrightLabel.setText("Copyright © by HyrniT");
         copyrightLabel.setFont(new Font(MyFont, Font.PLAIN, 12));
         copyrightLabel.setForeground(OnPrimaryColor);
@@ -117,29 +102,29 @@ public class ServerGUI extends JFrame {
 
         rightPanel.add(bottomrightPanel, BorderLayout.SOUTH);
 
-        leftPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(PrimaryColor);
 
-        verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         verticalSplitPane.setBackground(PrimaryColor);
 
-        bottomLeftPanel = new JPanel(new BorderLayout());
+        JPanel bottomLeftPanel = new JPanel(new BorderLayout());
         bottomLeftPanel.setBackground(PrimaryColor);
         bottomLeftPanel.setPreferredSize(new Dimension(0, 500));
         bottomLeftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        topBottomLeftPanel = new JPanel(new BorderLayout());
+        JPanel topBottomLeftPanel = new JPanel(new BorderLayout());
         topBottomLeftPanel.setBackground(PrimaryColor);
         topBottomLeftPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 
-        traceLabel = new JLabel();
+        JLabel traceLabel = new JLabel();
         traceLabel.setText("Tracing information");
         traceLabel.setFont(new Font(MyFont, Font.BOLD, 15));
         traceLabel.setForeground(OnPrimaryColor);
         traceLabel.setBackground(PrimaryColor);
         traceLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        exportButton = new JButton();
+        JButton exportButton = new JButton();
         exportButton.setText("Export");
         exportButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         exportButton.setFocusPainted(false);
@@ -157,7 +142,7 @@ public class ServerGUI extends JFrame {
         traceTextArea.setWrapStyleWord(false);
         traceTextArea.setEditable(false);
 
-        bottomLeftScrolPane = new JScrollPane(traceTextArea);
+        JScrollPane bottomLeftScrolPane = new JScrollPane(traceTextArea);
         bottomLeftScrolPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         bottomLeftScrolPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         bottomLeftScrolPane.setBorder(null);
@@ -165,10 +150,10 @@ public class ServerGUI extends JFrame {
         bottomLeftPanel.add(bottomLeftScrolPane, BorderLayout.CENTER);
         bottomLeftPanel.add(topBottomLeftPanel, BorderLayout.NORTH);
 
-        topTopLeftPanel = new JPanel(new BorderLayout());
+        JPanel topTopLeftPanel = new JPanel(new BorderLayout());
         topTopLeftPanel.setBackground(PrimaryColor);
 
-        appLabel = new JLabel();
+        JLabel appLabel = new JLabel();
         appLabel.setText("HyrniT's Monitoring System");
         appLabel.setFont(new Font(MyFont, Font.BOLD, 20));
         appLabel.setOpaque(true);
@@ -177,14 +162,14 @@ public class ServerGUI extends JFrame {
         appLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         appLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        monitorLabel = new JLabel();
+        JLabel monitorLabel = new JLabel();
         monitorLabel.setText("Monitors Management");
         monitorLabel.setFont(new Font(MyFont, Font.BOLD, 15));
         monitorLabel.setForeground(OnPrimaryColor);
         monitorLabel.setBackground(PrimaryColor);
         monitorLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        connectButton = new JButton();
+        JButton connectButton = new JButton();
         connectButton.setText("Connect");
         connectButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         connectButton.setFocusPainted(false);
@@ -200,13 +185,13 @@ public class ServerGUI extends JFrame {
         monitorsPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         monitorsPanel.setBackground(PrimaryColor);
 
-        topLeftScrolPane = new JScrollPane(monitorsPanel);
+        JScrollPane topLeftScrolPane = new JScrollPane(monitorsPanel);
         topLeftScrolPane.getViewport().setBackground(PrimaryColor);
         topLeftScrolPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         topLeftScrolPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         topLeftScrolPane.setBorder(null);
 
-        topLeftPanel = new JPanel(new BorderLayout());
+        JPanel topLeftPanel = new JPanel(new BorderLayout());
         topLeftPanel.setBackground(PrimaryColor);
         topLeftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         topLeftPanel.add(topTopLeftPanel, BorderLayout.NORTH);
@@ -218,7 +203,7 @@ public class ServerGUI extends JFrame {
         verticalSplitPane.setResizeWeight(1);
         leftPanel.add(verticalSplitPane, BorderLayout.CENTER);
 
-        horizonalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        JSplitPane horizonalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         horizonalSplitPane.setLeftComponent(leftPanel);
         horizonalSplitPane.setRightComponent(rightPanel);
         horizonalSplitPane.setDividerSize(5);
@@ -242,7 +227,7 @@ public class ServerGUI extends JFrame {
 
             Image icon = new ImageIcon("Server/Images/server.png").getImage().getScaledInstance(50, 50,
                     Image.SCALE_SMOOTH);
-            serverButton = new JButton();
+            JButton serverButton = new JButton();
             serverButton.setIcon(new ImageIcon(icon));
             serverButton.setBackground(PrimaryColor);
             serverButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -307,84 +292,95 @@ public class ServerGUI extends JFrame {
         }
     }
 
-    public static void createClient(String clientName, String clientIP, boolean clientStatus) {
+    public static void createClient(Socket clientSocket, File clientFile, boolean clientStatus) {
+        String clientIP = clientSocket.getInetAddress().getHostAddress();
+        String clientName = clientSocket.getInetAddress().getHostName();
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
         Image icon = new ImageIcon("Server/Images/client.png").getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-            clientButton = new JButton();
-            clientButton.setIcon(new ImageIcon(icon));
-            clientButton.setBackground(PrimaryColor);
-            clientButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            clientButton.setBorder(null);
-            clientButton.setActionCommand(clientIP); // phần này quan trọng để phân biệt các button client vs nhau
-            clientButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String command = e.getActionCommand();
-                    if (command.equals(clientIP)) {
-                        if(clientStatus) {
-                            JOptionPane.showConfirmDialog(clientButton, clientIP);
+        clientButton = new JButton();
+        clientButton.setIcon(new ImageIcon(icon));
+        clientButton.setBackground(PrimaryColor);
+        clientButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        clientButton.setBorder(null);
+        clientButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rootNode.removeAllChildren();
+                createFileTree(clientFile, rootNode);
+                fileTree = new JTree(rootNode);
+                fileTree.setBackground(PrimaryColor);
+                fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+                fileTree.addTreeSelectionListener(new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent event) {
+                        selectedNode = (DefaultMutableTreeNode) fileTree.getLastSelectedPathComponent();
+                        if (selectedNode != null) {
+                            traceButton.setEnabled(true);
                         } else {
-
+                            traceButton.setEnabled(false);
                         }
-                    } 
-                }
-            });
-
-            JLabel client = new JLabel("(Client)");
-            JLabel name = new JLabel("<html><b>Name: " + "</b>" + clientName + "</html>");
-            JLabel ip = new JLabel("<html><b>IP: " + "</b>" + clientIP + "</html>");
-            clientStatusLabel = new JLabel(); 
-
-            client.setBackground(PrimaryColor);
-            client.setForeground(OnPrimaryColor);
-            client.setFont(new Font(MyFont, Font.BOLD, 13));
-            client.setBorder(null);
-
-            name.setBackground(PrimaryColor);
-            name.setForeground(OnPrimaryColor);
-            name.setFont(new Font(MyFont, Font.PLAIN, 12));
-            name.setBorder(null);
-
-            ip.setBackground(PrimaryColor);
-            ip.setForeground(OnPrimaryColor);
-            ip.setFont(new Font(MyFont, Font.PLAIN, 12));
-            ip.setBorder(null);
-
-            clientStatusLabel.setBackground(PrimaryColor);
-            clientStatusLabel.setFont(new Font(MyFont, Font.BOLD, 12));
-            clientStatusLabel.setBorder(null);
-            if(clientStatus) {
-                showStatus("Connected", StatusType.CONNECTED);
-            } else {
-                showStatus("Disconnected", StatusType.DISCONNECTED);
+                    }
+                });
+                rightScrolPane.setViewportView(fileTree);
             }
+        });
 
-            JPanel verticalStackPanel = new JPanel();
-            verticalStackPanel.setLayout(new GridBagLayout());
-            verticalStackPanel.setBackground(PrimaryColor);
-            verticalStackPanel.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.CENTER;
-            gbc.insets = new Insets(2, 3, 2, 3);
+        JLabel client = new JLabel("(Client)");
+        JLabel name = new JLabel("<html><b>Name: " + "</b>" + clientName + "</html>");
+        JLabel ip = new JLabel("<html><b>IP: " + "</b>" + clientIP + "</html>");
+        clientStatusLabel = new JLabel();
 
-            verticalStackPanel.add(clientButton, gbc);
-            gbc.gridy++;
-            verticalStackPanel.add(client, gbc);
+        client.setBackground(PrimaryColor);
+        client.setForeground(OnPrimaryColor);
+        client.setFont(new Font(MyFont, Font.BOLD, 13));
+        client.setBorder(null);
 
-            gbc.gridy++;
-            verticalStackPanel.add(name, gbc);
+        name.setBackground(PrimaryColor);
+        name.setForeground(OnPrimaryColor);
+        name.setFont(new Font(MyFont, Font.PLAIN, 12));
+        name.setBorder(null);
 
-            gbc.gridy++;
-            verticalStackPanel.add(ip, gbc);
+        ip.setBackground(PrimaryColor);
+        ip.setForeground(OnPrimaryColor);
+        ip.setFont(new Font(MyFont, Font.PLAIN, 12));
+        ip.setBorder(null);
 
-            gbc.gridy++;
-            verticalStackPanel.add(clientStatusLabel, gbc);
+        clientStatusLabel.setBackground(PrimaryColor);
+        clientStatusLabel.setFont(new Font(MyFont, Font.BOLD, 12));
+        clientStatusLabel.setBorder(null);
+        if (clientStatus) {
+            showStatus("Connected", StatusType.CONNECTED);
+        } else {
+            showStatus("Disconnected", StatusType.DISCONNECTED);
+        }
 
-            monitorsPanel.add(verticalStackPanel);
+        JPanel verticalStackPanel = new JPanel();
+        verticalStackPanel.setLayout(new GridBagLayout());
+        verticalStackPanel.setBackground(PrimaryColor);
+        verticalStackPanel.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(2, 3, 2, 3);
 
-            monitorsPanel.revalidate();
-            monitorsPanel.repaint();
+        verticalStackPanel.add(clientButton, gbc);
+        gbc.gridy++;
+        verticalStackPanel.add(client, gbc);
+
+        gbc.gridy++;
+        verticalStackPanel.add(name, gbc);
+
+        gbc.gridy++;
+        verticalStackPanel.add(ip, gbc);
+
+        gbc.gridy++;
+        verticalStackPanel.add(clientStatusLabel, gbc);
+
+        monitorsPanel.add(verticalStackPanel);
+
+        monitorsPanel.revalidate();
+        monitorsPanel.repaint();
     }
 
     private void createPortInput() {
@@ -436,45 +432,12 @@ public class ServerGUI extends JFrame {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == serverButton) {
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-                    int result = fileChooser.showOpenDialog(ServerGUI.this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        isWatchingServer = isWatchingServer && true;
-                        reloadButton.setEnabled(true);
-                        traceButton.setEnabled(false);
-                        File selectedDirectory = fileChooser.getSelectedFile();
-                        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-                                selectedDirectory.getAbsolutePath());
-                        createFileTree(selectedDirectory, rootNode);
-                        fileTree = new JTree(rootNode);
-                        fileTree.setBackground(PrimaryColor);
-                        fileTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-                        fileTree.addTreeSelectionListener(new TreeSelectionListener() {
-                            @Override
-                            public void valueChanged(TreeSelectionEvent event) {
-                                selectedNode = (DefaultMutableTreeNode) fileTree.getLastSelectedPathComponent();
-                                if (selectedNode != null) {
-                                    traceButton.setEnabled(true);
-                                    // String path = getPathFromNode(selectedNode);
-                                    // traceTextArea.append(path + '\n');
-                                } else {
-                                    traceButton.setEnabled(false);
-                                }
-                            }
-                        });
-
-                        rightScrolPane.setViewportView(fileTree);
-                    }
-                }
                 if (e.getSource() == traceButton) {
                     if (selectedNode != null) {
-                        stopWatchingServer();
-                        startWatchingServer(selectedNode);
+                        // stopWatchingServer();
+                        // startWatchingServer(selectedNode);
                         traceButton.setEnabled(false);
-                        isWatchingServer = true;
+                        // isWatchingServer = true;
                     }
                 }
             }
@@ -494,7 +457,7 @@ public class ServerGUI extends JFrame {
         return path.toString();
     }
 
-    private void createFileTree(File directory, DefaultMutableTreeNode parentNode) {
+    public static void createFileTree(File directory, DefaultMutableTreeNode parentNode) {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -508,53 +471,53 @@ public class ServerGUI extends JFrame {
         }
     }
 
-    private void startWatchingServer(DefaultMutableTreeNode selectedNode) {
-        String folderPath = getPathFromNode(selectedNode).toString();
-        Path path = Paths.get(folderPath);
-        try {
-            WatchService watchService = FileSystems.getDefault().newWatchService();
-            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-                    StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+    // private void startWatchingServer(DefaultMutableTreeNode selectedNode) {
+    // String folderPath = getPathFromNode(selectedNode).toString();
+    // Path path = Paths.get(folderPath);
+    // try {
+    // WatchService watchService = FileSystems.getDefault().newWatchService();
+    // path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+    // StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
 
-            serverMonitorThread = new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        WatchKey watchKey;
-                        while ((watchKey = watchService.take()) != null) {
-                            for (WatchEvent<?> event : watchKey.pollEvents()) {
-                                WatchEvent.Kind<?> kind = event.kind();
-                                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                                    String message = Helper.getTimestamp() + serverName + " (server) created: "
-                                            + getPathFromNode(selectedNode) + event.context();
-                                    traceTextArea.append(message + "\n");
-                                } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                                    String message = Helper.getTimestamp() + serverName + " (server) deleted: "
-                                            + getPathFromNode(selectedNode) + event.context();
-                                    traceTextArea.append(message + "\n");
-                                } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                    String message = Helper.getTimestamp() + serverName + " (server) modified: "
-                                            + getPathFromNode(selectedNode) + event.context();
-                                    traceTextArea.append(message + "\n");
-                                }
-                            }
-                            watchKey.reset();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            serverMonitorThread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // serverMonitorThread = new Thread(new Runnable() {
+    // public void run() {
+    // try {
+    // WatchKey watchKey;
+    // while ((watchKey = watchService.take()) != null) {
+    // for (WatchEvent<?> event : watchKey.pollEvents()) {
+    // WatchEvent.Kind<?> kind = event.kind();
+    // if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+    // String message = Helper.getTimestamp() + serverName + " (server) created: "
+    // + getPathFromNode(selectedNode) + event.context();
+    // traceTextArea.append(message + "\n");
+    // } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+    // String message = Helper.getTimestamp() + serverName + " (server) deleted: "
+    // + getPathFromNode(selectedNode) + event.context();
+    // traceTextArea.append(message + "\n");
+    // } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+    // String message = Helper.getTimestamp() + serverName + " (server) modified: "
+    // + getPathFromNode(selectedNode) + event.context();
+    // traceTextArea.append(message + "\n");
+    // }
+    // }
+    // watchKey.reset();
+    // }
+    // } catch (InterruptedException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // });
+    // serverMonitorThread.start();
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // }
 
-    private void stopWatchingServer() {
-        if (isWatchingServer) {
-            serverMonitorThread.interrupt();
-        }
-    }
+    // private void stopWatchingServer() {
+    // if (isWatchingServer) {
+    // serverMonitorThread.interrupt();
+    // }
+    // }
 
     public class StartServer implements Runnable {
         @Override
@@ -572,24 +535,12 @@ public class ServerGUI extends JFrame {
         clientStatusLabel.setText(status);
         switch (type) {
             case CONNECTED:
-            clientStatusLabel.setForeground(new Color(33, 181, 49));
+                clientStatusLabel.setForeground(new Color(33, 181, 49));
                 break;
             case DISCONNECTED:
-            clientStatusLabel.setForeground(new Color(187, 31, 29));
+                clientStatusLabel.setForeground(new Color(187, 31, 29));
                 break;
         }
-    }
-
-    public void sendMessage() {
-        // xử lý giao diện
-        // ..
-        // String message = get từ textfield nào
-        // int clientId = Integer.parseInt(get từ combobox nào)
-        // server.sendMessage(message, clientId);
-
-        // enter xong nhớ setText=""
-        // sau khi viết xong phương thức này thì thêm vào event của nút send hoặc enter
-        // (xem mẫu tại monitoring-system)
     }
 
     public static void main(String[] args) {

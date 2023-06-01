@@ -22,6 +22,15 @@ public class ClientGUI extends JFrame {
     private JScrollPane chatJScrollPane;
 
     public ClientGUI() {
+
+        try {
+            this.client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
+        } catch (NumberFormatException | IOException e) {
+            e.printStackTrace();
+        }
+
+        new Thread(new StartClient()).start();
+
         setTitle("Client");
         setLayout(new BorderLayout());
 
@@ -99,7 +108,7 @@ public class ClientGUI extends JFrame {
         pathLabel.setPreferredSize(new Dimension(80, 24));
 
         pathTextField = new JTextField();
-        pathTextField.setText(ClientConnectGUI.directoryPath);
+        pathTextField.setText(ClientConnectGUI.selectedFile.getAbsolutePath());
         pathTextField.setBackground(PrimaryColor);
         pathTextField.setForeground(OnPrimaryColor);
         pathTextField.setCaretColor(PrimaryColor);
@@ -184,16 +193,6 @@ public class ClientGUI extends JFrame {
         setResizable(false);
         setVisible(true);
 
-        // Init client to connect to server with server ip & port
-        try {
-            this.client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort);
-        } catch (NumberFormatException | IOException e) {
-            e.printStackTrace();
-        }
-
-        // Start client chat thread (receive message from server)
-        new Thread(new StartChatClient()).start();
-
         setLocationRelativeTo(null);
     }
 
@@ -211,14 +210,9 @@ public class ClientGUI extends JFrame {
         });
     }
 
-    public class StartChatClient implements Runnable {
+    public class StartClient implements Runnable {
         @Override
         public void run() {
-            // bên server thì được viết bằng phương thức start()
-            // InetAddress clientAddress = client.getClientSocket().getInetAddress();
-            // String clientHostName = clientAddress.getHostName() + "/" + clientAddress.getHostAddress();
-            // client.sendMessage(clientHostName);
-            // Thread này để lắng nghe tin nhắn từ server
             try {
                 String message;
                 while ((message = client.getMessageReceiver().receiveMessage()) != null) {
@@ -229,21 +223,5 @@ public class ClientGUI extends JFrame {
             }
         }
     }
-
-    // public void sendMessage() {
-    //     // xử lý giao diện
-    //     // ..
-    //     String message = chatTextField.getText();
-    //     client.sendMessage(message);
-    //     // server.sendMessage(message, clientId);
-    //     // enter xong nhớ setText=""
-    // }
-
-    // public class StartMonitorClient implements Runnable {
-    //     @Override
-    //     public void run() {
-
-    //     }
-    // }
 
 }

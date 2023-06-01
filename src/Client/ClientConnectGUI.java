@@ -16,7 +16,8 @@ public class ClientConnectGUI extends JFrame {
     public static Color OnPrimaryColor = Color.BLACK;
     public static String MyFont = "Dialog";
 
-    public static String serverIP, serverPort, directoryPath;
+    public static String serverIP, serverPort;
+    public static File selectedFile;
 
     private JLabel appLabel, ipLabel, portLabel, browserLabel, messsageLabel;
     private JPanel centerPanel, ipPanel, portPanel, browserPanel, buttonPanel;
@@ -175,19 +176,18 @@ public class ClientConnectGUI extends JFrame {
                     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int result = fileChooser.showOpenDialog(ClientConnectGUI.this);
                     if (result == JFileChooser.APPROVE_OPTION) {
-                        File selectedDirectory = fileChooser.getSelectedFile();
-                        pathTextField.setText(selectedDirectory.getAbsolutePath());
+                        selectedFile = fileChooser.getSelectedFile();
+                        pathTextField.setText(selectedFile.getAbsolutePath());
                     }
                 }
                 if (e.getSource() == testButton) {
                     serverIP = ipTextField.getText();
                     serverPort = portTextField.getText();
-                    directoryPath = pathTextField.getText();
 
                     boolean isValidPort = checkValidPort(serverPort);
                     boolean isValidIp = checkValidIp(serverIP);
                     boolean isConnected = checkConnection(serverIP, serverPort);
-                    boolean isDirectoryExist = checkDirectoryExist(directoryPath);
+                    boolean isDirectoryExist = checkDirectoryExist(pathTextField.getText());
 
                     if (isConnected && isDirectoryExist && isValidIp && isValidPort) {
                         connectButton.setEnabled(true);
