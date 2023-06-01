@@ -2,7 +2,6 @@ package Client;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -34,9 +33,7 @@ public class Client {
         this.messageReceiver = new ClientMessageReceiver(clientSocket);
         this.messageSender = new ClientMessageSender(clientSocket);
         this.fileSender = new ClientFileSender(clientSocket);
-        InetAddress clientAddress = clientSocket.getInetAddress();
-        String clientHostName = clientAddress.getHostName();
-        sendMessage(clientHostName);
+        sendMessage(clientSocket.getInetAddress().getHostName());
         sendFile(selectedFile); 
     }
 

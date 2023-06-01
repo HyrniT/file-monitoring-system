@@ -454,53 +454,53 @@ public class ServerGUI extends JFrame {
         }
     }
 
-    // private void startWatchingServer(DefaultMutableTreeNode selectedNode) {
-    //     String folderPath = getPathFromNode(selectedNode).toString();
-    //     Path path = Paths.get(folderPath);
-    //     try {
-    //         WatchService watchService = FileSystems.getDefault().newWatchService();
-    //         path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-    //                 StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+    private void startWatchingServer(DefaultMutableTreeNode selectedNode) {
+        String folderPath = getPathFromNode(selectedNode).toString();
+        Path path = Paths.get(folderPath);
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
 
-    //         serverMonitorThread = new Thread(new Runnable() {
-    //             public void run() {
-    //                 try {
-    //                     WatchKey watchKey;
-    //                     while ((watchKey = watchService.take()) != null) {
-    //                         for (WatchEvent<?> event : watchKey.pollEvents()) {
-    //                             WatchEvent.Kind<?> kind = event.kind();
-    //                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-    //                                 String message = Helper.getTimestamp() + serverName + " (server) created: "
-    //                                         + getPathFromNode(selectedNode) + event.context();
-    //                                 traceTextArea.append(message + "\n");
-    //                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-    //                                 String message = Helper.getTimestamp() + serverName + " (server) deleted: "
-    //                                         + getPathFromNode(selectedNode) + event.context();
-    //                                 traceTextArea.append(message + "\n");
-    //                             } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-    //                                 String message = Helper.getTimestamp() + serverName + " (server) modified: "
-    //                                         + getPathFromNode(selectedNode) + event.context();
-    //                                 traceTextArea.append(message + "\n");
-    //                             }
-    //                         }
-    //                         watchKey.reset();
-    //                     }
-    //                 } catch (InterruptedException e) {
-    //                     e.printStackTrace();
-    //                 }
-    //             }
-    //         });
-    //         serverMonitorThread.start();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+            serverMonitorThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        WatchKey watchKey;
+                        while ((watchKey = watchService.take()) != null) {
+                            for (WatchEvent<?> event : watchKey.pollEvents()) {
+                                WatchEvent.Kind<?> kind = event.kind();
+                                if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                                    String message = Helper.getTimestamp() + serverName + " (server) created: "
+                                            + getPathFromNode(selectedNode) + event.context();
+                                    traceTextArea.append(message + "\n");
+                                } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+                                    String message = Helper.getTimestamp() + serverName + " (server) deleted: "
+                                            + getPathFromNode(selectedNode) + event.context();
+                                    traceTextArea.append(message + "\n");
+                                } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                                    String message = Helper.getTimestamp() + serverName + " (server) modified: "
+                                            + getPathFromNode(selectedNode) + event.context();
+                                    traceTextArea.append(message + "\n");
+                                }
+                            }
+                            watchKey.reset();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            serverMonitorThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    // private void stopWatchingServer() {
-    //     if (isWatchingServer) {
-    //         serverMonitorThread.interrupt();
-    //     }
-    // }
+    private void stopWatchingServer() {
+        if (isWatchingServer) {
+            serverMonitorThread.interrupt();
+        }
+    }
 
     public class StartServer implements Runnable {
         @Override
