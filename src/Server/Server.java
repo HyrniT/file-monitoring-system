@@ -1,6 +1,8 @@
 package Server;
 
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 import java.util.*;
 
@@ -8,7 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 public class Server {
     // Fields
-    private ServerSocket serverSocket; 
+    private ServerSocket serverSocket;
     private List<ClientMessageHandler> clientMessageHandlers;
 
     public List<ClientMessageHandler> getClientMessageHandlers() {
@@ -55,11 +57,11 @@ public class Server {
         private ClientMessageReceiver messageReceiver;
         private ClientMessageSender messageSender;
         private ClientFileReceiver fileReceiver;
-        
+
         public File getClientFile() {
             return clientFile;
         }
-        
+
         public ClientFileReceiver getFileReceiver() {
             return fileReceiver;
         }
@@ -83,7 +85,7 @@ public class Server {
                 e.printStackTrace();
             }
         }
-        
+
         @Override
         public void run() {
             try {
@@ -93,14 +95,15 @@ public class Server {
 
                 ServerGUI.createFileTree(clientFile, rootNode);
 
-                String clientMessage = Helper.getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
+                String clientMessage = getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
 
                 ServerGUI.createClient(clientSocket, clientFile, true); // tạm thời cho luôn true
 
                 String message;
-                while((message = messageReceiver.receiveMessage()) != null) {
-                    message = Helper.getTimestamp() + clientName + " (client) said: " + message;
+                while ((message = messageReceiver.receiveMessage()) != null) {
+                    // message = Helper.getTimestamp() + clientName + " (client) said: " + message;
+                    message += "\n";
                     ServerGUI.traceTextArea.append(message);
                 }
 
@@ -116,6 +119,12 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public static String getTimestamp() {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            return now.format(formatter) + " | ";
         }
     }
 }
