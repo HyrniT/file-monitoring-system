@@ -240,7 +240,7 @@ public class ServerGUI extends JFrame {
             serverIP = localhost.getHostAddress();
             serverName = localhost.getHostName();
 
-            Image icon = new ImageIcon("Server/Images/admin.png").getImage().getScaledInstance(50, 50,
+            Image icon = new ImageIcon("Server/Images/server.png").getImage().getScaledInstance(50, 50,
                     Image.SCALE_SMOOTH);
             serverButton = new JButton();
             serverButton.setIcon(new ImageIcon(icon));
