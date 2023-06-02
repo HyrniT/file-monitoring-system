@@ -87,7 +87,7 @@ public class ServerGUI extends JFrame {
         reloadButton.setFocusPainted(false);
         reloadButton.setEnabled(false);
 
-        buttonPanel.add(reloadButton);
+        // buttonPanel.add(reloadButton);
         buttonPanel.add(traceButton);
 
         JPanel toprightPanel = new JPanel(new BorderLayout());
@@ -193,7 +193,7 @@ public class ServerGUI extends JFrame {
         JPanel monitorPanel = new JPanel(new BorderLayout());
         monitorPanel.setBackground(PrimaryColor);
         monitorPanel.add(monitorLabel, BorderLayout.CENTER);
-        monitorPanel.add(connectButton, BorderLayout.EAST);
+        // monitorPanel.add(connectButton, BorderLayout.EAST);
 
         topTopLeftPanel.add(appLabel, BorderLayout.CENTER);
         topTopLeftPanel.add(monitorPanel, BorderLayout.SOUTH);
