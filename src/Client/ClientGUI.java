@@ -188,27 +188,17 @@ public class ClientGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(e.getSource() == sendButton) {
-                    String message = chatTextField.getText() + "\n";
-                    ClientConnectGUI.client.sendMessage(message);
-                    chatTextArea.append("You: " + message);
-                    chatTextField.setText("");
+                    String message = chatTextField.getText();
+                    if(message != "") {
+                        chatTextArea.append(Client.getTimestamp() + "You: " + message + "\n");
+                        String clientName = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostName();
+                        String clientIP = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostAddress();
+                        message = Client.getTimestamp() + clientName + " (" + clientIP + ") said: " + message;
+                        ClientConnectGUI.client.sendMessage(message);
+                        chatTextField.setText("");
+                    }
                 }
             }
         });
     }
-
-    // public class StartClient implements Runnable {
-    //     @Override
-    //     public void run() {
-    //         try {
-    //             String message;
-    //             while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
-    //                 chatTextArea.append(message + "\n");
-    //             }
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //     }
-    // }
-
 }

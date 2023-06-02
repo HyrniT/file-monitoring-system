@@ -46,7 +46,7 @@ public class Client {
             this.fileSender = new ClientFileSender(clientSocket);
             sendMessage(clientSocket.getInetAddress().getHostName());
             sendFile(selectedFile);
-            startWatchingServer(selectedFile);
+            startWatching(selectedFile);
             ClientConnectGUI.isConnected = 0;
         } catch (NumberFormatException e) {
             ClientConnectGUI.isConnected = 1;
@@ -77,7 +77,9 @@ public class Client {
             try {
                 String message;
                 while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
-                    // ClientGUI.chatTextArea.append(message + "\n");
+                    stopWatching();
+                    File selectedFile = new File(message);
+                    startWatching(selectedFile);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -85,7 +87,13 @@ public class Client {
         }
     }
 
-    private void startWatchingServer(File selectedFile) {
+    private void stopWatching() {
+        if(clientMonitorThread != null) {
+            clientMonitorThread.interrupt();
+        }
+    }
+
+    private void startWatching(File selectedFile) {
         String folderPath = selectedFile.getAbsolutePath();
         Path path = Paths.get(folderPath);
         String clientName = clientSocket.getInetAddress().getHostName();
@@ -118,7 +126,7 @@ public class Client {
                         watchKey.reset();
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             });
             clientMonitorThread.start();
