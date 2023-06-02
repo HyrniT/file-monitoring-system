@@ -27,12 +27,12 @@ public class ServerGUI extends JFrame {
     public static String MyFont = "Dialog";
 
     public ServerGUI() {
-        setTitle("Server");
-        setLayout(new BorderLayout());
-
         createPortInput();
 
         new Thread(new StartServer()).start();
+        
+        setTitle("Server");
+        setLayout(new BorderLayout());
 
         rightScrolPane = new JScrollPane();
         rightScrolPane.setBackground(OnPrimaryColor);
