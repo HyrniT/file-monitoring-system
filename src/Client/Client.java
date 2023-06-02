@@ -14,14 +14,13 @@ import java.nio.file.WatchService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
 public class Client {
-    private Socket clientSocket; 
+    private Socket clientSocket;
     private Thread clientMonitorThread;
     private ClientMessageReceiver messageReceiver;
     private ClientMessageSender messageSender;
     private ClientFileSender fileSender;
-    
+
     public ClientFileSender getFileSender() {
         return fileSender;
     }
@@ -46,7 +45,7 @@ public class Client {
             this.messageSender = new ClientMessageSender(clientSocket);
             this.fileSender = new ClientFileSender(clientSocket);
             sendMessage(clientSocket.getInetAddress().getHostName());
-            sendFile(selectedFile); 
+            sendFile(selectedFile);
             startWatchingServer(selectedFile);
             ClientConnectGUI.isConnected = 0;
         } catch (NumberFormatException e) {
@@ -80,7 +79,7 @@ public class Client {
             WatchService watchService = FileSystems.getDefault().newWatchService();
             path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
                     StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
-    
+
             clientMonitorThread = new Thread(() -> {
                 try {
                     WatchKey watchKey;
@@ -94,7 +93,7 @@ public class Client {
                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                                 String message = getTimestamp() + clientName + " (" + clientIP + ") deleted: "
                                         + selectedFile.toPath().resolve((Path) event.context());
-                                        sendMessage(message);
+                                sendMessage(message);
                             } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                                 String message = getTimestamp() + clientName + " (" + clientIP + ") modified: "
                                         + selectedFile.toPath().resolve((Path) event.context());
@@ -112,7 +111,7 @@ public class Client {
             e.printStackTrace();
         }
     }
-    
+
     public static String getTimestamp() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
