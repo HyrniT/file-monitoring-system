@@ -13,10 +13,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class Server {
     // Fields
     private ServerSocket serverSocket;
-    private List<ClientMessageHandler> clientMessageHandlers;
+    private List<ClientHandler> clientHandlers;
 
-    public List<ClientMessageHandler> getClientMessageHandlers() {
-        return clientMessageHandlers;
+    public List<ClientHandler> getClientHandlers() {
+        return clientHandlers;
     }
 
     public ServerSocket getServerSocket() {
@@ -26,7 +26,7 @@ public class Server {
     // Constructors
     public Server(String serverPort) throws IOException {
         this.serverSocket = new ServerSocket(Integer.parseInt(serverPort));
-        this.clientMessageHandlers = new ArrayList<ClientMessageHandler>();
+        this.clientHandlers = new ArrayList<ClientHandler>();
     }
 
     // Methods
@@ -35,22 +35,22 @@ public class Server {
             try {
                 Socket clientSocket = serverSocket.accept();
 
-                ClientMessageHandler clientMessageHandler = new ClientMessageHandler(clientSocket);
-                clientMessageHandlers.add(clientMessageHandler);
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clientHandlers.add(clientHandler);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                clientMessageHandler.start();
+                clientHandler.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public ClientMessageHandler findClientMessageHandlerByIP(String clientIP) {
-        for (ClientMessageHandler handler : clientMessageHandlers) {
+    public ClientHandler findClientMessageHandlerByIP(String clientIP) {
+        for (ClientHandler handler : clientHandlers) {
             InetAddress address = handler.clientSocket.getInetAddress();
             if (address.getHostAddress().equals(clientIP)) {
                 return handler;
@@ -60,15 +60,21 @@ public class Server {
     }
 
     public void sendMessage(String message, String clientIP) {
-        ClientMessageHandler handler = findClientMessageHandlerByIP(clientIP);
-        if (handler != null) {
-            handler.sendMessage(message);
+        ClientHandler client = findClientMessageHandlerByIP(clientIP);
+        if (client != null) {
+            client.sendMessage(message);
         } else {
-            System.out.println("Not found!");
+            // Do nothing
         }
     }
 
-    public class ClientMessageHandler extends Thread {
+    public void broadcastMessage(String message) {
+        for (ClientHandler client : clientHandlers) {
+            client.sendMessage(message);
+        }
+    }
+
+    public class ClientHandler extends Thread {
         private Socket clientSocket;
         private File clientFile = null;
         private boolean clientStatus;
@@ -101,7 +107,7 @@ public class Server {
         }
 
         // Constructors
-        public ClientMessageHandler(Socket socket) {
+        public ClientHandler(Socket socket) {
             this.clientSocket = socket;
             try {
                 this.messageReceiver = new ClientMessageReceiver(socket);

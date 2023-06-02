@@ -12,6 +12,8 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+import javax.swing.JOptionPane;
+
 public class Client {
     private Socket clientSocket;
     private Thread clientMonitorThread;
@@ -75,9 +77,15 @@ public class Client {
             try {
                 String message;
                 while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
-                    stopWatching();
-                    File selectedFile = new File(message);
-                    startWatching(selectedFile);
+                    if(message.equals("@disconnect")) {
+                        JOptionPane.showMessageDialog(null, "Sorry! HyrniT's Monitoring System is down", 
+                        "", JOptionPane.WARNING_MESSAGE);
+                        clientSocket.close();
+                    } else {
+                        stopWatching();
+                        File selectedFile = new File(message);
+                        startWatching(selectedFile);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -129,7 +137,7 @@ public class Client {
             });
             clientMonitorThread.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 }

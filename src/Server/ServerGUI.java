@@ -9,6 +9,8 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,7 +40,7 @@ public class ServerGUI extends JFrame {
         createPortInput();
 
         new Thread(new StartServer()).start();
-        
+
         setTitle("Server");
         setLayout(new BorderLayout());
 
@@ -229,8 +231,29 @@ public class ServerGUI extends JFrame {
 
         setSize(1200, 800);
         setVisible(true);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(ServerGUI.this, "Are you sure to shut down server ?",
+                        "Tips", JOptionPane.YES_OPTION);
+                if (option == JOptionPane.YES_OPTION) {
+                    server.broadcastMessage("@disconnect");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                    }
+                    try {
+                        server.getServerSocket().close();
+                    } catch (IOException e1) {
+                        // e1.printStackTrace();
+                    }
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     private void createServer() {
@@ -302,7 +325,7 @@ public class ServerGUI extends JFrame {
             monitorsPanel.repaint();
 
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -418,7 +441,7 @@ public class ServerGUI extends JFrame {
                         try {
                             server = new Server(serverPort);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            // e.printStackTrace();
                         }
                         break;
                     } else {
@@ -475,17 +498,17 @@ public class ServerGUI extends JFrame {
     private void exportLogFile() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentTime = dateFormat.format(new Date());
-    
+
         String fileName = currentTime + ".txt";
-    
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             String traceContent = traceTextArea.getText();
-    
+
             writer.write(traceContent);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
