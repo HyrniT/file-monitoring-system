@@ -1,6 +1,8 @@
 package Server;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
@@ -26,6 +28,7 @@ public class ServerGUI extends JFrame {
     public static JTextArea traceTextArea;
     public static JPanel monitorsPanel;
     public static JPanel clientContainer;
+    private JButton exportButton;
 
     public static Color PrimaryColor = Color.WHITE;
     public static Color OnPrimaryColor = Color.BLACK;
@@ -127,7 +130,7 @@ public class ServerGUI extends JFrame {
         traceLabel.setBackground(PrimaryColor);
         traceLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        JButton exportButton = new JButton();
+        exportButton = new JButton();
         exportButton.setText("Export");
         exportButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         exportButton.setFocusPainted(false);
@@ -151,6 +154,7 @@ public class ServerGUI extends JFrame {
         traceTextArea.setLineWrap(false);
         traceTextArea.setWrapStyleWord(false);
         traceTextArea.setEditable(false);
+        addTextAreaActionListener(traceTextArea);
 
         JScrollPane bottomLeftScrolPane = new JScrollPane(traceTextArea);
         bottomLeftScrolPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -485,6 +489,25 @@ public class ServerGUI extends JFrame {
         }
     }
 
+    public void addTextAreaActionListener(JTextArea textArea) {
+        traceTextArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                exportButton.setEnabled(true);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                exportButton.setEnabled(true);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                exportButton.setEnabled(true);
+            }
+        });
+    }
+
     public class StartServer implements Runnable {
         @Override
         public void run() {
@@ -513,10 +536,5 @@ public class ServerGUI extends JFrame {
         SwingUtilities.invokeLater(() -> {
             new ServerGUI();
         });
-        // SwingUtilities.invokeLater(new Runnable() {
-        // public void run() {
-        // new ServerGUI();
-        // }
-        // });
     }
 }
