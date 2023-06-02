@@ -18,7 +18,7 @@ public class ClientFileReceiver {
         try {
             return (File) objectInputStream.readObject();
         } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return null;
     }
