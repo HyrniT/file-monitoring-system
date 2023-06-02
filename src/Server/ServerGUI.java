@@ -7,9 +7,13 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class ServerGUI extends JFrame {
     private Server server;
@@ -127,6 +131,13 @@ public class ServerGUI extends JFrame {
         exportButton.setText("Export");
         exportButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         exportButton.setFocusPainted(false);
+        exportButton.setEnabled(false);
+        exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exportLogFile();
+            }
+        });
 
         topBottomLeftPanel.add(traceLabel, BorderLayout.CENTER);
         topBottomLeftPanel.add(exportButton, BorderLayout.EAST);
@@ -454,6 +465,23 @@ public class ServerGUI extends JFrame {
                     createFileTree(file, childNode);
                 }
             }
+        }
+    }
+
+    private void exportLogFile() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentTime = dateFormat.format(new Date());
+    
+        String fileName = currentTime + ".txt";
+    
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            String traceContent = traceTextArea.getText();
+    
+            writer.write(traceContent);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
