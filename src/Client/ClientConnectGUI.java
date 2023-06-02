@@ -143,7 +143,6 @@ public class ClientConnectGUI extends JFrame {
         // Message
         messsageLabel = new JLabel();
         messsageLabel.setFont(new Font(MyFont, Font.ITALIC, 12));
-        // messsageLabel.setForeground(MessageColor);
         messsageLabel.setBackground(PrimaryColor);
         messsageLabel.setPreferredSize(new Dimension(360, 24));
 
@@ -187,7 +186,6 @@ public class ClientConnectGUI extends JFrame {
 
                     boolean isValidPort = checkValidPort(serverPort);
                     boolean isValidIp = checkValidIp(serverIP);
-                    // boolean isConnected = checkConnection(serverIP, serverPort);
                     boolean isDirectoryExist = checkDirectoryExist(pathTextField.getText());
 
                     if (isDirectoryExist && isValidIp && isValidPort) {
@@ -204,8 +202,6 @@ public class ClientConnectGUI extends JFrame {
                     }
                 }
                 if (e.getSource() == connectButton) {
-                    // serverIP = ipTextField.getText();
-                    // serverPort = portTextField.getText();
                     client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
                     
                     switch (isConnected) {
@@ -317,20 +313,6 @@ public class ClientConnectGUI extends JFrame {
             return false;
         }
     }
-
-    // private boolean checkConnection(String ipAddress, String port) {
-    // try {
-    // if (checkValidPort(port) && checkValidIp(ipAddress)) {
-    // int portNumber = Integer.parseInt(port);
-    // Socket clientSocket = new Socket(ipAddress, portNumber);
-    // clientSocket.close();
-    // return true;
-    // }
-    // return false;
-    // } catch (IOException e) {
-    // return false;
-    // }
-    // }
 
     private boolean checkDirectoryExist(String path) {
         File directory = new File(path);
