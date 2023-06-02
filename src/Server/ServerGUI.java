@@ -62,16 +62,12 @@ public class ServerGUI extends JFrame {
         traceButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         traceButton.setFocusPainted(false);
         traceButton.setEnabled(false);
-        // addButtonActionListener(traceButton);
         traceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // stopWatchingServer();
-                // startWatchingServer(selectedNode);
                 String message = getPathFromNode(selectedNode);
                 server.sendMessage(message, selectedClient);
                 traceButton.setEnabled(false);
-                // isWatchingServer = true;
             }
         });
 
@@ -458,12 +454,6 @@ public class ServerGUI extends JFrame {
             }
         }
     }
-
-    // private void stopWatchingServer() {
-    //     if (isWatchingServer) {
-    //         serverMonitorThread.interrupt();
-    //     }
-    // }
 
     public class StartServer implements Runnable {
         @Override
