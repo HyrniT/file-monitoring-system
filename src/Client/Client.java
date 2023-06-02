@@ -55,6 +55,7 @@ public class Client {
         } catch (IOException e) {
             ClientConnectGUI.isConnected = 3;
         }
+        new Thread(new StartClient()).start();
     }
 
     // Methods
@@ -68,6 +69,20 @@ public class Client {
 
     public void sendFile(File file) {
         fileSender.sendFile(file);
+    }
+
+    public class StartClient implements Runnable {
+        @Override
+        public void run() {
+            try {
+                String message;
+                while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
+                    // ClientGUI.chatTextArea.append(message + "\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void startWatchingServer(File selectedFile) {

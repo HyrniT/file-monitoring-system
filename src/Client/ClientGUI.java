@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class ClientGUI extends JFrame {
     public static Color PrimaryColor = Color.WHITE;
@@ -19,8 +18,6 @@ public class ClientGUI extends JFrame {
     private JScrollPane chatJScrollPane;
 
     public ClientGUI() {
-        new Thread(new StartClient()).start();
-
         setTitle("Client");
         setLayout(new BorderLayout());
 
@@ -200,18 +197,18 @@ public class ClientGUI extends JFrame {
         });
     }
 
-    public class StartClient implements Runnable {
-        @Override
-        public void run() {
-            try {
-                String message;
-                while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
-                    chatTextArea.append(message + "\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    // public class StartClient implements Runnable {
+    //     @Override
+    //     public void run() {
+    //         try {
+    //             String message;
+    //             while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
+    //                 chatTextArea.append(message + "\n");
+    //             }
+    //         } catch (IOException e) {
+    //             e.printStackTrace();
+    //         }
+    //     }
+    // }
 
 }
