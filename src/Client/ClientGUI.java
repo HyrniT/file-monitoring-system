@@ -11,9 +11,6 @@ public class ClientGUI extends JFrame {
     public static Color OnPrimaryColor = Color.BLACK;
     public static String MyFont = "Dialog";
 
-    // Client
-    // private Client client;
-
     private JLabel appLabel, ipLabel, portLabel, pathLabel, chatLabel;
     private JPanel topPanel, ipPanel, portPanel, pathPanel, sendPanel, bottomPanel;
     private JTextField ipTextField, portTextField, pathTextField, chatTextField;
@@ -22,8 +19,6 @@ public class ClientGUI extends JFrame {
     private JScrollPane chatJScrollPane;
 
     public ClientGUI() {
-        // this.client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
-
         new Thread(new StartClient()).start();
 
         setTitle("Client");
