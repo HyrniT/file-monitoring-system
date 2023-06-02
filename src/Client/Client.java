@@ -14,6 +14,7 @@ import java.nio.file.WatchService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+
 public class Client {
     private Socket clientSocket; 
     private Thread clientMonitorThread;
@@ -38,14 +39,23 @@ public class Client {
     }
 
     // Constructors
-    public Client(String serverIP, String serverPort, File selectedFile) throws NumberFormatException, UnknownHostException, IOException {
-        this.clientSocket = new Socket(serverIP, Integer.parseInt(serverPort));
-        this.messageReceiver = new ClientMessageReceiver(clientSocket);
-        this.messageSender = new ClientMessageSender(clientSocket);
-        this.fileSender = new ClientFileSender(clientSocket);
-        sendMessage(clientSocket.getInetAddress().getHostName());
-        sendFile(selectedFile); 
-        startWatchingServer(selectedFile);
+    public Client(String serverIP, String serverPort, File selectedFile) {
+        try {
+            this.clientSocket = new Socket(serverIP, Integer.parseInt(serverPort));
+            this.messageReceiver = new ClientMessageReceiver(clientSocket);
+            this.messageSender = new ClientMessageSender(clientSocket);
+            this.fileSender = new ClientFileSender(clientSocket);
+            sendMessage(clientSocket.getInetAddress().getHostName());
+            sendFile(selectedFile); 
+            startWatchingServer(selectedFile);
+            ClientConnectGUI.isConnected = 0;
+        } catch (NumberFormatException e) {
+            ClientConnectGUI.isConnected = 1;
+        } catch (UnknownHostException e) {
+            ClientConnectGUI.isConnected = 2;
+        } catch (IOException e) {
+            ClientConnectGUI.isConnected = 3;
+        }
     }
 
     // Methods

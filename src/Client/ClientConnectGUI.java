@@ -3,21 +3,22 @@ package Client;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
 
 public class ClientConnectGUI extends JFrame {
     public static Color PrimaryColor = Color.WHITE;
     public static Color OnPrimaryColor = Color.BLACK;
     public static String MyFont = "Dialog";
 
+    public static Client client;
+
     public static String serverIP, serverPort;
     public static File selectedFile;
+    public static int isConnected = 0;
 
     private JLabel appLabel, ipLabel, portLabel, browserLabel, messsageLabel;
     private JPanel centerPanel, ipPanel, portPanel, browserPanel, buttonPanel;
@@ -186,10 +187,10 @@ public class ClientConnectGUI extends JFrame {
 
                     boolean isValidPort = checkValidPort(serverPort);
                     boolean isValidIp = checkValidIp(serverIP);
-                    boolean isConnected = checkConnection(serverIP, serverPort);
+                    // boolean isConnected = checkConnection(serverIP, serverPort);
                     boolean isDirectoryExist = checkDirectoryExist(pathTextField.getText());
 
-                    if (isConnected && isDirectoryExist && isValidIp && isValidPort) {
+                    if (isDirectoryExist && isValidIp && isValidPort) {
                         connectButton.setEnabled(true);
                         showMessage("Valid connection!", MessageType.SUCCESS);
                     } else if (!isValidIp) {
@@ -203,11 +204,54 @@ public class ClientConnectGUI extends JFrame {
                     }
                 }
                 if (e.getSource() == connectButton) {
-                    dispose();
+                    // serverIP = ipTextField.getText();
+                    // serverPort = portTextField.getText();
+                    client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
+                    
+                    switch (isConnected) {
+                        case 0:
+                            dispose();
+                            SwingUtilities.invokeLater(() -> {
+                                new ClientGUI();
+                            });
+                            break;
+                        
+                        case 1:
+                            JOptionPane.showMessageDialog(null, "Invalid port number! Please enter a port between 0 and 65535.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                            // System.exit(0);
+                            try {
+                                client.getClientSocket().close();
+                            } catch (IOException e1) {
+                                // e1.printStackTrace();
+                            }
+                            break;
 
-                    SwingUtilities.invokeLater(() -> {
-                        new ClientGUI();
-                    });
+                        case 2:
+                            JOptionPane.showMessageDialog(null, "Errors! Cannot connect to server.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                            // System.exit(0);
+                            try {
+                                client.getClientSocket().close();
+                            } catch (IOException e1) {
+                                // e1.printStackTrace();
+                            }
+                            break;
+
+                        case 3:
+                            JOptionPane.showMessageDialog(null, "Invalid server port or IP! Please try again.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                            // System.exit(0);
+                            try {
+                                client.getClientSocket().close();
+                            } catch (IOException e1) {
+                                // e1.printStackTrace();
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
         });
@@ -219,10 +263,12 @@ public class ClientConnectGUI extends JFrame {
             public void insertUpdate(DocumentEvent e) {
                 connectButton.setEnabled(false);
             }
+
             @Override
             public void removeUpdate(DocumentEvent e) {
                 connectButton.setEnabled(false);
             }
+
             @Override
             public void changedUpdate(DocumentEvent e) {
                 connectButton.setEnabled(false);
@@ -272,19 +318,19 @@ public class ClientConnectGUI extends JFrame {
         }
     }
 
-    private boolean checkConnection(String ipAddress, String port) {
-        try {
-            if (checkValidPort(port) && checkValidIp(ipAddress)) {
-                int portNumber = Integer.parseInt(port);
-                Socket clientSocket = new Socket(ipAddress, portNumber); // throw exc
-                clientSocket.close();
-                return true;
-            }
-            return false;
-        } catch (IOException e) {
-            return false;
-        }
-    }
+    // private boolean checkConnection(String ipAddress, String port) {
+    // try {
+    // if (checkValidPort(port) && checkValidIp(ipAddress)) {
+    // int portNumber = Integer.parseInt(port);
+    // Socket clientSocket = new Socket(ipAddress, portNumber);
+    // clientSocket.close();
+    // return true;
+    // }
+    // return false;
+    // } catch (IOException e) {
+    // return false;
+    // }
+    // }
 
     private boolean checkDirectoryExist(String path) {
         File directory = new File(path);

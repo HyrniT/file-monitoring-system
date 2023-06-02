@@ -15,6 +15,7 @@ public class ServerGUI extends JFrame {
     private Server server;
     private String serverIP, serverName, serverPort;
     private static DefaultMutableTreeNode selectedNode;
+    private static String selectedClient;
     private static JPanel monitorsPanel;
     private static JLabel clientStatusLabel;
     private static JButton traceButton;
@@ -67,6 +68,8 @@ public class ServerGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // stopWatchingServer();
                 // startWatchingServer(selectedNode);
+                String message = getPathFromNode(selectedNode);
+                server.sendMessage(message, selectedClient);
                 traceButton.setEnabled(false);
                 // isWatchingServer = true;
             }
@@ -301,9 +304,11 @@ public class ServerGUI extends JFrame {
         clientButton.setBackground(PrimaryColor);
         clientButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         clientButton.setBorder(null);
+        clientButton.setActionCommand(clientIP);
         clientButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedClient = e.getActionCommand();
                 rootNode.removeAllChildren();
                 createFileTree(clientFile, rootNode);
                 JTree fileTree = new JTree(rootNode);

@@ -12,7 +12,7 @@ public class ClientGUI extends JFrame {
     public static String MyFont = "Dialog";
 
     // Client
-    private Client client;
+    // private Client client;
 
     private JLabel appLabel, ipLabel, portLabel, pathLabel, chatLabel;
     private JPanel topPanel, ipPanel, portPanel, pathPanel, sendPanel, bottomPanel;
@@ -22,12 +22,7 @@ public class ClientGUI extends JFrame {
     private JScrollPane chatJScrollPane;
 
     public ClientGUI() {
-
-        try {
-            this.client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
-        } catch (NumberFormatException | IOException e) {
-            e.printStackTrace();
-        }
+        // this.client = new Client(ClientConnectGUI.serverIP, ClientConnectGUI.serverPort, ClientConnectGUI.selectedFile);
 
         new Thread(new StartClient()).start();
 
@@ -202,7 +197,7 @@ public class ClientGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(e.getSource() == sendButton) {
                     String message = chatTextField.getText() + "\n";
-                    client.sendMessage(message);
+                    ClientConnectGUI.client.sendMessage(message);
                     chatTextArea.append("You: " + message);
                     chatTextField.setText("");
                 }
@@ -215,7 +210,7 @@ public class ClientGUI extends JFrame {
         public void run() {
             try {
                 String message;
-                while ((message = client.getMessageReceiver().receiveMessage()) != null) {
+                while ((message = ClientConnectGUI.client.getMessageReceiver().receiveMessage()) != null) {
                     chatTextArea.append(message + "\n");
                 }
             } catch (IOException e) {

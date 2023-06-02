@@ -47,8 +47,24 @@ public class Server {
         }
     }
 
-    public void sendMessage(String message, int clientId) {
-        clientMessageHandlers.get(clientId).sendMessage(message);
+    public ClientMessageHandler findClientMessageHandlerByIP(String clientIP) {
+        for (ClientMessageHandler handler : clientMessageHandlers) {
+            InetAddress address = handler.clientSocket.getInetAddress();
+            if (address.getHostAddress().equals(clientIP)) {
+                return handler;
+            }
+        }
+        return null; 
+    }
+    
+
+    public void sendMessage(String message, String clientIP) {
+        ClientMessageHandler handler = findClientMessageHandlerByIP(clientIP);
+        if (handler != null) {
+            handler.sendMessage(message);
+        } else {
+            System.out.println("Not found!");
+        }
     }
 
     public class ClientMessageHandler extends Thread {
