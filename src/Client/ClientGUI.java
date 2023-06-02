@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -178,26 +181,46 @@ public class ClientGUI extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH);
 
         setSize(400, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setResizable(false);
         setVisible(true);
 
         setLocationRelativeTo(null);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                JOptionPane.showMessageDialog(ClientGUI.this, "Please click \"Disconnect\" button to exit!",
+                        "Tips", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
     }
 
     private void addButtonActionListener(JButton button) {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == sendButton) {
+                if (e.getSource() == sendButton) {
                     String message = chatTextField.getText();
-                    if(message != "") {
+                    if (!message.isEmpty()) {
                         chatTextArea.append(getTimestamp() + "You: " + message + "\n");
                         String clientName = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostName();
                         String clientIP = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostAddress();
                         message = clientName + " (" + clientIP + ") said: " + message;
                         ClientConnectGUI.client.sendMessage(message);
                         chatTextField.setText("");
+                    }
+                }
+                if (e.getSource() == disconnectButton) {
+                    int option = JOptionPane.showConfirmDialog(ClientGUI.this, "Are you sure to disconnect?",
+                            "Confirm", JOptionPane.YES_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        // Gửi thông báo disconnect tới server
+                        ClientConnectGUI.client.sendMessage("@disconnect");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e1) {
+                        }
+                        System.exit(0);
                     }
                 }
             }

@@ -16,11 +16,12 @@ public class ServerGUI extends JFrame {
     private String serverIP, serverName, serverPort;
     private static DefaultMutableTreeNode selectedNode;
     private static String selectedClient;
-    private static JPanel monitorsPanel;
     private static JLabel clientStatusLabel;
     private static JButton traceButton;
     private static JScrollPane rightScrolPane;
     public static JTextArea traceTextArea;
+    public static JPanel monitorsPanel;
+    public static JPanel clientContainer;
 
     public static Color PrimaryColor = Color.WHITE;
     public static Color OnPrimaryColor = Color.BLACK;
@@ -354,7 +355,8 @@ public class ServerGUI extends JFrame {
             showStatus("Disconnected", StatusType.DISCONNECTED);
         }
 
-        JPanel clientContainer = new JPanel();
+        clientContainer = new JPanel();
+        clientContainer.setName(clientIP);
         clientContainer.setLayout(new GridBagLayout());
         clientContainer.setBackground(PrimaryColor);
         clientContainer.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));

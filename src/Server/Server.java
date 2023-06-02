@@ -3,9 +3,11 @@ package Server;
 import java.net.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.awt.Component;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class Server {
@@ -54,9 +56,8 @@ public class Server {
                 return handler;
             }
         }
-        return null; 
+        return null;
     }
-    
 
     public void sendMessage(String message, String clientIP) {
         ClientMessageHandler handler = findClientMessageHandlerByIP(clientIP);
@@ -74,7 +75,7 @@ public class Server {
         private ClientMessageReceiver messageReceiver;
         private ClientMessageSender messageSender;
         private ClientFileReceiver fileReceiver;
-        
+
         public boolean isClientStatus() {
             return clientStatus;
         }
@@ -115,12 +116,13 @@ public class Server {
         public void run() {
             try {
                 String clientName = messageReceiver.receiveMessage();
+                String clientIP = clientSocket.getInetAddress().getHostAddress();
                 clientFile = fileReceiver.receiveFile();
                 DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
 
                 ServerGUI.createFileTree(clientFile, rootNode);
 
-                String clientMessage = getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
+                String clientMessage = getTimestamp() + clientName + " (" + clientIP + "): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
                 clientStatus = true;
 
@@ -128,10 +130,29 @@ public class Server {
 
                 String message;
                 while ((message = messageReceiver.receiveMessage()) != null) {
-                    message = getTimestamp() + message + "\n";
+                    if (message.equals("@disconnect")) {
+                        message = getTimestamp() + clientName + " (" + clientIP + "): DISCONNECTED!" + "\n";
+                        // Update GUI
+                        Component[] components = ServerGUI.monitorsPanel.getComponents();
+                        for (Component component : components) {
+                            if (component instanceof JPanel) {
+                                JPanel panel = (JPanel) component;
+                                if (panel.getName() != null && panel.getName().equals(clientIP)) {
+                                    ServerGUI.monitorsPanel.remove(panel);
+                                    break;
+                                }
+                            }
+                        }
+                        ServerGUI.monitorsPanel.revalidate();
+                        ServerGUI.monitorsPanel.repaint();
+                        // Interrup thread
+                        this.interrupt();
+                    } else {
+                        message = getTimestamp() + message + "\n";
+                    }
                     ServerGUI.traceTextArea.append(message);
                 }
-
+                
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
