@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ClientGUI extends JFrame {
     public static Color PrimaryColor = Color.WHITE;
@@ -190,15 +192,21 @@ public class ClientGUI extends JFrame {
                 if(e.getSource() == sendButton) {
                     String message = chatTextField.getText();
                     if(message != "") {
-                        chatTextArea.append(Client.getTimestamp() + "You: " + message + "\n");
+                        chatTextArea.append(getTimestamp() + "You: " + message + "\n");
                         String clientName = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostName();
                         String clientIP = ClientConnectGUI.client.getClientSocket().getInetAddress().getHostAddress();
-                        message = Client.getTimestamp() + clientName + " (" + clientIP + ") said: " + message;
+                        message = clientName + " (" + clientIP + ") said: " + message;
                         ClientConnectGUI.client.sendMessage(message);
                         chatTextField.setText("");
                     }
                 }
             }
         });
+    }
+
+    private String getTimestamp() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return now.format(formatter) + " | ";
     }
 }

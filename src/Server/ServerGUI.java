@@ -354,30 +354,30 @@ public class ServerGUI extends JFrame {
             showStatus("Disconnected", StatusType.DISCONNECTED);
         }
 
-        JPanel verticalStackPanel = new JPanel();
-        verticalStackPanel.setLayout(new GridBagLayout());
-        verticalStackPanel.setBackground(PrimaryColor);
-        verticalStackPanel.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));
+        JPanel clientContainer = new JPanel();
+        clientContainer.setLayout(new GridBagLayout());
+        clientContainer.setBackground(PrimaryColor);
+        clientContainer.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(2, 3, 2, 3);
 
-        verticalStackPanel.add(clientButton, gbc);
+        clientContainer.add(clientButton, gbc);
         gbc.gridy++;
-        verticalStackPanel.add(client, gbc);
+        clientContainer.add(client, gbc);
 
         gbc.gridy++;
-        verticalStackPanel.add(name, gbc);
+        clientContainer.add(name, gbc);
 
         gbc.gridy++;
-        verticalStackPanel.add(ip, gbc);
+        clientContainer.add(ip, gbc);
 
         gbc.gridy++;
-        verticalStackPanel.add(clientStatusLabel, gbc);
+        clientContainer.add(clientStatusLabel, gbc);
 
-        monitorsPanel.add(verticalStackPanel);
+        monitorsPanel.add(clientContainer);
 
         monitorsPanel.revalidate();
         monitorsPanel.repaint();

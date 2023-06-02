@@ -70,9 +70,18 @@ public class Server {
     public class ClientMessageHandler extends Thread {
         private Socket clientSocket;
         private File clientFile = null;
+        private boolean clientStatus;
         private ClientMessageReceiver messageReceiver;
         private ClientMessageSender messageSender;
         private ClientFileReceiver fileReceiver;
+        
+        public boolean isClientStatus() {
+            return clientStatus;
+        }
+
+        public void setClientStatus(boolean clientStatus) {
+            this.clientStatus = clientStatus;
+        }
 
         public File getClientFile() {
             return clientFile;
@@ -113,13 +122,13 @@ public class Server {
 
                 String clientMessage = getTimestamp() + clientName + " (client): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
+                clientStatus = true;
 
-                ServerGUI.createClient(clientSocket, clientFile, true); // tạm thời cho luôn true
+                ServerGUI.createClient(clientSocket, clientFile, clientStatus);
 
                 String message;
                 while ((message = messageReceiver.receiveMessage()) != null) {
-                    // message = Helper.getTimestamp() + clientName + " (client) said: " + message;
-                    message += "\n";
+                    message = getTimestamp() + message + "\n";
                     ServerGUI.traceTextArea.append(message);
                 }
 

@@ -110,15 +110,15 @@ public class Client {
                         for (WatchEvent<?> event : watchKey.pollEvents()) {
                             WatchEvent.Kind<?> kind = event.kind();
                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                                String message = getTimestamp() + clientName + " (" + clientIP + ") created: "
+                                String message = clientName + " (" + clientIP + ") created: "
                                         + selectedFile.toPath().resolve((Path) event.context());
                                 sendMessage(message);
                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                                String message = getTimestamp() + clientName + " (" + clientIP + ") deleted: "
+                                String message = clientName + " (" + clientIP + ") deleted: "
                                         + selectedFile.toPath().resolve((Path) event.context());
                                 sendMessage(message);
                             } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                String message = getTimestamp() + clientName + " (" + clientIP + ") modified: "
+                                String message = clientName + " (" + clientIP + ") modified: "
                                         + selectedFile.toPath().resolve((Path) event.context());
                                 sendMessage(message);
                             }
@@ -133,11 +133,5 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static String getTimestamp() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return now.format(formatter) + " | ";
     }
 }
