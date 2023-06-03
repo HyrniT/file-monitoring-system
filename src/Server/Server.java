@@ -49,24 +49,27 @@ public class Server {
         }
     }
 
-    public ClientHandler findClientMessageHandlerByIP(String clientIP) {
+    public ClientHandler findClientMessageHandlerByPort(String clientPort) {
+        int port = Integer.parseInt(clientPort);
         for (ClientHandler handler : clientHandlers) {
-            InetAddress address = handler.clientSocket.getInetAddress();
-            if (address.getHostAddress().equals(clientIP)) {
+            int handlerPort = handler.clientSocket.getPort();
+            if (handlerPort == port) {
                 return handler;
             }
         }
         return null;
     }
+    
 
-    public void sendMessage(String message, String clientIP) {
-        ClientHandler client = findClientMessageHandlerByIP(clientIP);
+    public void sendMessage(String message, String clientPort) {
+        ClientHandler client = findClientMessageHandlerByPort(clientPort);
         if (client != null) {
             client.sendMessage(message);
         } else {
             // Do nothing
         }
     }
+    
 
     public void broadcastMessage(String message) {
         for (ClientHandler client : clientHandlers) {
@@ -123,12 +126,13 @@ public class Server {
             try {
                 String clientName = messageReceiver.receiveMessage();
                 String clientIP = clientSocket.getInetAddress().getHostAddress();
+                String clientPort = clientSocket.getPort() + "";
                 clientFile = fileReceiver.receiveFile();
                 DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
 
                 ServerGUI.createFileTree(clientFile, rootNode);
 
-                String clientMessage = getTimestamp() + clientName + " (" + clientIP + "): CONNECTED!" + "\n";
+                String clientMessage = getTimestamp() + clientName + " (" + clientIP + "/" + clientPort + "): CONNECTED!" + "\n";
                 ServerGUI.traceTextArea.append(clientMessage);
                 clientStatus = true;
 
@@ -137,13 +141,13 @@ public class Server {
                 String message;
                 while ((message = messageReceiver.receiveMessage()) != null) {
                     if (message.equals("@disconnect")) {
-                        message = getTimestamp() + clientName + " (" + clientIP + "): DISCONNECTED!" + "\n";
+                        message = getTimestamp() + clientName + " (" + clientIP + "/" + clientPort + "): DISCONNECTED!" + "\n";
                         // Update GUI
                         Component[] components = ServerGUI.monitorsPanel.getComponents();
                         for (Component component : components) {
                             if (component instanceof JPanel) {
                                 JPanel panel = (JPanel) component;
-                                if (panel.getName() != null && panel.getName().equals(clientIP)) {
+                                if (panel.getName() != null && panel.getName().equals(clientPort)) {
                                     ServerGUI.monitorsPanel.remove(panel);
                                     break;
                                 }

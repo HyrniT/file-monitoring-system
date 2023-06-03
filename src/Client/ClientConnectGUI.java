@@ -118,6 +118,7 @@ public class ClientConnectGUI extends JFrame {
         pathTextField.setForeground(OnPrimaryColor);
         pathTextField.setCaretColor(OnPrimaryColor);
         pathTextField.setPreferredSize(new Dimension(360, 24));
+        pathTextField.setEditable(false);
         addTextFieldActionListener(pathTextField);
 
         // Button

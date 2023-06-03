@@ -20,6 +20,15 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 public class ServerGUI extends JFrame {
+    private static ServerGUI instance;
+
+    public static synchronized ServerGUI getInstance() {
+        if (instance == null) {
+            instance = new ServerGUI();
+        }
+        return instance;
+    }
+
     private Server server;
     private String serverIP, serverName, serverPort;
     private static DefaultMutableTreeNode selectedNode;
@@ -330,6 +339,7 @@ public class ServerGUI extends JFrame {
     }
 
     public static void createClient(Socket clientSocket, File clientFile, boolean clientStatus) {
+        String clientPort = clientSocket.getPort() + "";
         String clientIP = clientSocket.getInetAddress().getHostAddress();
         String clientName = clientSocket.getInetAddress().getHostName();
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(clientFile.getAbsolutePath());
@@ -339,7 +349,7 @@ public class ServerGUI extends JFrame {
         clientButton.setBackground(PrimaryColor);
         clientButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         clientButton.setBorder(null);
-        clientButton.setActionCommand(clientIP);
+        clientButton.setActionCommand(clientPort);
         clientButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -394,7 +404,7 @@ public class ServerGUI extends JFrame {
         }
 
         clientContainer = new JPanel();
-        clientContainer.setName(clientIP);
+        clientContainer.setName(clientPort);
         clientContainer.setLayout(new GridBagLayout());
         clientContainer.setBackground(PrimaryColor);
         clientContainer.setBorder(BorderFactory.createLineBorder(OnPrimaryColor, 2));
