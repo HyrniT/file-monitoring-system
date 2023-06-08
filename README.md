@@ -1,4 +1,4 @@
-# 👀 Fike Monitoring System - Version 1.1
+# 👀 File Monitoring System - Version 1.1
 
 ### ❤️ This is my Java project at HCMUS, includes the following main functions:
 
